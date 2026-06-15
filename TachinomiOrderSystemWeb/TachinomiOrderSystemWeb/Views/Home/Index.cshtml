@@ -1,0 +1,165 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>立ち飲みオーダーシステム (TachinomiOrderSystem)</title>
+    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true">
+    <!-- Google Fonts for Modern Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Background glow elements matching WPF Canvas bubbles -->
+    <div class="bg-glow bg-glow-yellow" aria-hidden="true"></div>
+    <div class="bg-glow bg-glow-green" aria-hidden="true"></div>
+
+    <div class="app-container">
+        <!-- Header Section -->
+        <header class="main-header">
+            <div class="header-left">
+                <h1 class="header-title">🍺 立ち飲み処『達人』</h1>
+                <span class="header-badge">立ち飲み基本学習システム</span>
+            </div>
+            <div class="header-right">
+                <button id="btn-view-history" class="btn btn-secondary">
+                    📋 会計履歴を見る
+                </button>
+                <div id="db-status-badge" class="db-status offline">
+                    <span class="db-status-dot"></span>
+                    <span id="db-status-text">DB接続エラー (オフライン)</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Layout Split -->
+        <main class="main-content">
+            <!-- Left Sidebar: Order Details / Cart -->
+            <section class="order-sidebar" aria-label="注文カート">
+                <h2 class="sidebar-title">ご注文明細</h2>
+                
+                <div class="cart-items-wrapper">
+                    <ul id="cart-list" class="cart-list">
+                        <!-- Dynamically populated cart items -->
+                        <li class="cart-empty-message">ご注文はまだありません。メニューから選択してください。</li>
+                    </ul>
+                </div>
+
+                <div class="cart-footer">
+                    <div class="total-price-row">
+                        <span class="total-label">合計金額 (税込)</span>
+                        <span id="grand-total" class="total-amount">0 円</span>
+                    </div>
+                    <button id="btn-checkout" class="btn btn-primary btn-large" disabled>
+                        お会計をする
+                    </button>
+                </div>
+            </section>
+
+            <!-- Right Pane: Menu Selection Grid -->
+            <section class="menu-section" aria-label="メニュー選択">
+                <h2 class="menu-title">メニューを選択してください</h2>
+                <div id="menu-grid" class="menu-grid">
+                    <!-- Dynamically populated menu cards -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- OVERLAY MODALS -->
+
+    <!-- 1. Order Confirm Modal -->
+    <div id="modal-order-confirm" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span class="modal-subtitle">ご注文の確認</span>
+                <h3 id="confirm-item-name" class="modal-title">生ビール</h3>
+                <span id="confirm-item-price" class="modal-price-badge">500円 (税込)</span>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Quantity Selector -->
+                <div class="quantity-picker">
+                    <button id="btn-qty-minus" class="btn btn-secondary btn-circle" aria-label="数量を減らす">−</button>
+                    <span id="confirm-qty" class="quantity-value">1</span>
+                    <button id="btn-qty-plus" class="btn btn-secondary btn-circle" aria-label="数量を増やす">+</button>
+                </div>
+            </div>
+
+            <div class="modal-footer split-buttons">
+                <button id="btn-cancel-order" class="btn btn-secondary">キャンセル</button>
+                <button id="btn-submit-order" class="btn btn-primary">注文を確定する</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Checkout Modal -->
+    <div id="modal-checkout" class="modal-overlay">
+        <div class="modal-box compact">
+            <h3 class="modal-title center">お会計の確認</h3>
+            <div class="modal-body center">
+                <p class="modal-desc">伝票の合計金額は以下の通りです</p>
+                <p id="checkout-total" class="modal-price-highlight">0 円</p>
+            </div>
+            <div class="modal-footer split-buttons">
+                <button id="btn-close-checkout" class="btn btn-secondary">戻る</button>
+                <button id="btn-confirm-checkout" class="btn btn-primary">支払い完了</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Checkout Complete Modal -->
+    <div id="modal-checkout-complete" class="modal-overlay">
+        <div class="modal-box compact">
+            <div class="modal-body center padded-top">
+                <h3 class="modal-title success">ご来店ありがとうございました！</h3>
+                <p class="modal-desc margin-top">またのご利用をお待ちしております。</p>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-reset-session" class="btn btn-primary btn-large">新しいセッションを開始</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Database Warning Modal -->
+    <div id="modal-db-warning" class="modal-overlay">
+        <div class="modal-box compact border-danger">
+            <h3 class="modal-title danger center">⚠️ DB接続警告</h3>
+            <div class="modal-body center">
+                <p id="db-warning-message" class="modal-desc text-white leading-loose">
+                    SQL Server LocalDB への接続に失敗しました。<br>
+                    アプリケーションは一時的に「オフライン・デモモード」で起動します。
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-close-warning" class="btn btn-secondary btn-large">確認</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. History Modal -->
+    <div id="modal-history" class="modal-overlay">
+        <div class="modal-box wide">
+            <h3 class="modal-title center">📋 過去のお会計履歴</h3>
+            
+            <div class="modal-body scrollable">
+                <ul id="history-list" class="history-list">
+                    <!-- Dynamically populated checkout histories -->
+                    <li class="history-empty-message">履歴はありません。</li>
+                </ul>
+            </div>
+
+            <div class="modal-footer split-buttons-unequal">
+                <button id="btn-clear-history" class="btn btn-danger">履歴をすべて削除</button>
+                <button id="btn-close-history" class="btn btn-secondary">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/js/app.js" asp-append-version="true"></script>
+</body>
+</html>

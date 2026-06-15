@@ -1,0 +1,22 @@
+# Kura Sushi Table Ordering System - Task Tracker
+
+- [x] Create Visual Studio Solution and Project Files
+  - [x] `KURAOrderSystem.sln`
+  - [x] `KURAOrderSystem/KURAOrderSystem.csproj` with Microsoft.Data.SqlClient package reference
+- [x] Database Setup
+  - [x] Create `DatabaseManager.cs` for automatic database/table creation and transactions
+- [x] Models & MVVM Base Code
+  - [x] Create `SushiItem.cs` and `OrderItem.cs`
+  - [x] Create `RelayCommand.cs` for commanding support
+- [x] Styling & Resources
+  - [x] Create `Resources/Styles.xaml` with premium styles and colors
+  - [x] Integrate styles into `App.xaml` and configure startup window
+- [x] ViewModels
+  - [x] Create `MainViewModel.cs` with cart logic, SQL database logging, Bikkura Pon triggering, and categories
+- [x] UI Views
+  - [x] Create `MainWindow.xaml` and `MainWindow.xaml.cs` (touch-screen UI layout, category navigation, sushi cards, footer bar)
+  - [x] Create `Views/BikkuraPonWindow.xaml` and `Views/BikkuraPonWindow.xaml.cs` (animations and prizes for Bikkura Pon)
+- [x] Verification
+  - [x] Verify build compiles cleanly with `dotnet build`
+  - [x] Test database connectivity and automatic schema generation
+  - [x] Run and manually test the main workflows: ordering, plate counting, Bikkura Pon trigger, and DB write-back.
